@@ -1,0 +1,6 @@
+Flamemaster/Bin/bin で $source Source.bash を実行することでFMを利用できる。
+
+
+1.FlamemasterITVからログインして、ソースコードのzipファイルを読み込む
+2.Repository/doc/LinuxにOSごとの手順が書いているので、それ通りにコマンドを打ち込む
+3.Installationの通りに実行する
