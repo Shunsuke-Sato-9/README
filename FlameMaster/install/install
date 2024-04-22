@@ -1,6 +1,212 @@
 Flamemaster/Bin/bin で $source Source.bash を実行することでFMを利用できる。
 
-
 1.FlamemasterITVからログインして、ソースコードのzipファイルを読み込む
 2.Repository/doc/LinuxにOSごとの手順が書いているので、それ通りにコマンドを打ち込む
 3.Installationの通りに実行する
+
+1. FlameMasterとは？ 
+    FlameMasterは0次元燃焼および1次元層流火炎計算のためのC++プログラムパッケージです。 
+    計算プログラムパッケージです。  
+
+2. 前提条件 
+    オペレーティングシステム(OS)別インストラクション 
+    ## ScanManとFlameManの実行例 
+    インストールステップ('make install')を再実行すると、インストール中に作成されたファ イルのすべての手動変更が上書きされることに注意してください。 
+    サンプルを実行する前に、環境が正しくセットアップされていることを確認してください。
+    現在のセットアップは、エイリアスコマンド 'fmagain' で常に確認できます。
+    このコマンドが不明な場合やエラーが表示される場合は、トップレベルの readme ファイル (FlameMaster/README.md) のシェル環境に関するセクションを読んでください。
+    例のスクリプトは 'FM_DATA' や 'FM_BIN' などの環境変数に依存しているため、正しい環境がないと動作しないことに注意してください。 
+    以下の順序で例を進めることを推奨する： 
+
+    1. Run/ScanMan 
+    2. Run/Diff/Steady/H2 
+    3. ラン/差分/定常/CH4 
+    4. 他の例を続ける 
+
+    ステップ0.で作成されたメカニズム・ファイルは、それ以降のステップを実行するために必要であることに注意してください.
+    sh bash $FM_RUN_SM/CreateAllMechanisms.bash を実行すれば、この例はスキップできます：
+
+    フレームレットライブラリの生成については、Repository/doc/FlameletLibraries.pdfr を見てください。 ディレクトリにあります。 
+
+    unixライクなシステムでは、__`check your package manager`__ instead of installing manually をチェックしてください。 W
+    indowsシステムでは（以下を除く    [cygwin](https://www.cygwin.com/)を除く)では、flexとbisonが自動的にインストールされます。 
+    が自動的にインストールされます。日時計も自動的にインストールされます。 
+    cmake を実行するときに `-DINSTALL_SUNDIALS=ON` オプションを使います)。 
+
+    FlameMasterのインストールには以下のプログラムが必要です： 
+    1. c および c++ コンパイラ (C11/C++14 準拠)  
+    2. [cmake] 
+    3.[flex] 
+    4. [bison] 
+    5. [sundials] 
+
+3. インストール 
+    3.1 概要 
+        以下は、CMake の簡単な紹介と、FlameMaster のインストールに必要なステップの説明です。 
+        の説明です。すでにCMake とビルド自動化ツール デフォルトの設定に基づくデフォルトの設定に基づく具体的なインストール手順は 3.2 節にあります。
+
+        FlameMaster は3つのステップでインストールします： 
+        1. CMakeを使ってFlameMasterの設定を行います。(コマンド例: `cmake ../Repository -DCMAKE_BUILD_TYPE=Release`). 
+
+        2. ビルド自動化ツールを使ってコンパイルする（コマンド例：`make`）。 
+
+        3. ビルド自動化ツールを使用したインストール (コマンド例: `make install`). デフォルトの設定では、このステップはの兄弟ディレクトリを作成する。 
+
+        4.- FlameMasterプロジェクトをビルドする前に、すべての前提条件（OS固有のヒントは `Repository/doc/` を参照）をCMakeが見つける必要があります。 
+
+    3.2 デフォルト設定での FlameMaster のインストール 
+
+        まだインストールしていない場合は、FlameMaster パッケージをダウンロードして展開します。 
+        または `git clone` を使ってリポジトリを取得する。git clone` を使うには、以下のどちらかをセットアップしてください。 
+        [ssh-key](https://docs.gitlab.com/ee/gitlab-basics/create-your-ssh-keys.html)  をセットアップして 
+
+        cd Your/Choice/FlameMaster 
+        を実行してください。 
+        git clone git@git.rwth-aachen.de:ITV/FlameMaster.git リポジトリ 
+        を実行するか、パスワードを設定した後に `https` 経由でリポジトリにアクセスしてください。
+
+        {sh} 
+
+        cd Your/Choice/FlameMaster 
+
+        git clone https://git.rwth-aachen.de/ITV/FlameMaster.git リポジトリ 
+
+        ユーザー名は github のユーザー名、もしくは  RWTH Aachen University のメールアドレス (例: `max.mustermann`@rwth-aachen.de または m.mustermann`@itv.rwth-aachen.de）。 
+        コマンドラインから以下を実行してください： 
+        {sh} 
+
+        mkdir -p Build && cd Build 
+
+        cmake ../リポジトリ -DCMAKE_BUILD_TYPE=Release 
+
+        cmake --build . -parallel --target install --config Release 
+
+        コマンド `cmake ../Repository -DCMAKE_BUILD_TYPE=Release` はCMakeを次のように指定します。 
+
+        CMakeLists.txtファイルを含むトップレベルのソースコードディレクトリ(`Repository/`)を指定します。 
+
+        ファイルを含むトップレベルのソースコードディレクトリ (`Repository/`) に CMake をポイントし、カレントディレクトリ (`Build/`) にある FlameMaster プロジェクトを設定します。 
+
+        設定がエラーなく終了すれば、FlameMaster をコンパイルすることができます。この'out-of-source build'では `Repository/` ディレクトリは変更されません。 
+
+        Note that CMake supports different  
+
+        [generators] as for example [Microsoft Visual Studio] You can specify a generator with the `-G` flag. 
+
+        ディレクトリは変更されず、複数の設定を行うことができます。 
+
+        CMakeはさまざまな  
+
+        [ジェネレータ 
+
+        例えば、[Microsoft Visual Studio] のように。あなたは  G`フラグでジェネレータを指定できます。 
+
+    3.3 ディレクトリのレイアウト 
+
+        CMakeの導入に伴い、プロジェクトのディレクトリ・レイアウトを見直すことにした。 
+
+        を改訂することにしました。この概要は、あなたが始めるのに役立つはずです。インストール・ステップの実行後 デフォルトのディレクトリレイアウトは以下の通りです： 
+
+        FlameMaster/`。 
+
+        Repository /`はソースコードを保存するディレクトリです。プロジェクトファイルの変更はプロジェクトファイルのすべての変更__はこのディレクトリで行う必要があります。 
+
+        Build/` 主に __configuration__ 情報 (「CMake キャッシュ」) とオブジェクト ファイル (*.o) を含む中間ディレクトリ 
+
+        `Run/` FlameMaster とその __examples__ を実行するためのディレクトリ。 再度インストール (`make install`) を実行すると、インストール中に作成されたファイルは上書きされることに注意してください。 永続的な変更を行うには、代わりに `Repository/examples/` 内のそれぞれのファイルを変更します。 
+
+        - bin/` __binaries__ と __environment__ のセットアップに使用できるスクリプトを含むディレクトリ
+
+        - Data/`前処理されたメカニズム ファイル (*.pre) のようなバイナリ __input files__ を保存するためのデフォルトの場所として使用できるディレクトリ。 このディレクトリは、バイナリ入力ファイルを見つけるために、シェル変数 FM_DATA を介して ScanMan と FlameMan によって自動的にチェックされます。 
+4. FlameMasterの実行 
+    4.1. 環境設定 
+
+        FlameMasterを起動するのに必要なものではありませんが、最初に環境をセットアップしておくと便利です。 
+
+        を設定した方が便利です。bash、csh、  
+
+        および zsh 用に用意されています： 
+
+        {sh} 
+
+        source Your/Choice/FlameMaster/Bin/bin/Source.{yourshell} です。 
+
+        
+
+        上記の行をあなたの 
+
+        ファイル`~/.{yourshell}rc`を参照してください。現在の設定は  
+
+        エイリアスコマンド `fmagain` で現在の設定を確認し、更新することができます。 
+
+        環境変数とエイリアスコマンドの一覧を表示します。手動で  
+
+        Source.{yourshell} で手動で変更した内容は、インストールを再実行すると上書きされてしまうことに注意してください。代わりに  
+
+        ファイル `Repository/config/SourceTemplate.{yourshell}.in` を修正し、インストールコマンドを再度実行してください。 
+
+        インストールコマンドを再度実行してください (`make install`)。 
+
+        
+
+        上記のいずれのシェルも使用しない場合、環境を設定せずにFlameMasterを実行することも可能です。 
+
+        を起動することも可能です。 
+
+        コマンドと変数の一覧は `Bin/bin/Source.bash` などにあります。 
+    4.2. 例 
+
+        いくつかの例を `FlameMaster/Run` で確認してください。Runの各ディレクトリで  
+
+        README.md ファイルを見てください。これらのファイルには  
+
+        どのようにコードを実行し、データを前処理、後処理するかについての説明がある。また、いくつかの有用な追加機能  
+
+        もREADME.mdファイルに記述されている。 
+
+5. ヘルプ 
+
+    インストール中に何らかの問題が発生した場合は 
+    設定ステップ (`cmake ../Repository -DCMAKE_BUILD_TYPE=Release`) またはコンパイルステップ (`cmake --build . [...]`) の完全な出力を送ってください。 
+    またはコンパイルステップ (`cmake --build . [..]`) を送ってください。     
+
+    誰でもFlameMasterに貢献することができます。例えば  
+    issue](https://git.rwth-aachen.de/ITV/FlameMaster/issues)でバグを報告することができます。 
+    より包括的な貢献には  
+    [昇格アクセス](https://docs.gitlab.com/ee/user/permissions.html) が必要です。あなたは  
+    ご連絡ください。さらなる情報は 
+    [寄稿ガイド](./CONTRIBUTING.md)をご覧ください。 
+
+    FlameMasterを起動するのに必要なものではありませんが、最初に環境をセットアップしておくと便利です。 
+
+    を設定した方が便利です。bash、csh、  
+
+    および zsh 用に用意されています： 
+
+    {sh} 
+
+    source Your/Choice/FlameMaster/Bin/bin/Source.{yourshell} です。 
+
+    
+
+    上記の行をあなたの 
+
+    ファイル`~/.{yourshell}rc`を参照してください。現在の設定は  
+
+    エイリアスコマンド `fmagain` で現在の設定を確認し、更新することができます。 
+
+    環境変数とエイリアスコマンドの一覧を表示します。手動で  
+
+    Source.{yourshell} で手動で変更した内容は、インストールを再実行すると上書きされてしまうことに注意してください。代わりに  
+
+    ファイル `Repository/config/SourceTemplate.{yourshell}.in` を修正し、インストールコマンドを再度実行してください。 
+
+    インストールコマンドを再度実行してください (`make install`)。 
+
+    
+
+    上記のいずれのシェルも使用しない場合、環境を設定せずにFlameMasterを実行することも可能です。 
+
+    を起動することも可能です。 
+
+    コマンドと変数の一覧は `Bin/bin/Source.bash` などにあります。 

@@ -1,3 +1,206 @@
 Flamemaster/Bin/bin で $source Source.bash を実行することでFMを利用できる。
 
 
+ScanMan と FlameMan の例の実行 
+    インストールステップ('make install')を再実行すると、インストール中に手動で変更したファイルはすべて上書きされることに注意してください。 
+    サンプルを実行する前に、環境が正しくセットアップされていることを確認してください。現在のセットアップは、エイリアスコマンド 'fmagain' で常に確認できます。このコマンドが不明な場合やエラーが表示される場合は、トップレベルの readme ファイル (FlameMaster/README.md) のシェル環境に関するセクションを読んでください。例のスクリプトは 'FM_DATA' や 'FM_BIN' などの環境変数に依存しているため、正しい環境がないと動作しないことに注意してください。 
+
+    以下の順序で例を進めることを推奨する：  
+
+    0. Run/ScanMan 
+    1. Run/Diff/Steady/H2 
+    2. 運転/拡散/定常/CH4 
+    3. 他の例を続ける 
+    ステップ0.で作成されたメカニズムファイルは、それ以降のステップを実行するために必要であることに注意してください。これをスキップすることができます。 
+
+    example if you run: 
+    {sh} 
+    bash $FM_RUN_SM/CreateAllMechanisms.bash 
+    For the generation of flamelet libraries, look at the file Repository/doc/FlameletLibraries.pdf 
+
+    ..................段区切り..................を実行した場合の例です： 
+    ~~~~~~~~~~~を実行します。 
+    bash $FM_RUN_SM/CreateAllMechanisms.bash 
+    フレームレットライブラリの生成については、Repository/doc/FlameletLibraries.pdfを参照してください。 
+
+
+ScanMan の実行 
+    この例ではScanManの使い方を簡単に紹介します。ScanMan は化学メカニズムファイルを処理し、バイナリファイルに変換し、熱力学データと輸送特性を追加します。ScanMan の実行によって生成される主な出力はバイナリ ファイル (*.pre) です。これは FlameMan の入力として使用され、その生成がこの例の焦点です。 
+
+    FlameManの入力として使用される。バイナリファイル(*.pre)は、FlameMan の計算に必要なメカニズムと化学種の特性の両方を提供する。 
+
+    ScanManは2つの異なるフォーマットのメカニズムテキストファイルを理解します：  
+
+    FlameMaster と Chemkin (version >= 3.3.11)です。フォーマットは 
+
+    オプション'-f'で、'flamemaster'(デフォルト)または'chemkin'を指定できます。 
+    
+    FlameMasterフォーマットのメカニズムでは、データの2段階処理が必要です。 
+    必要である。 
+    最初のステップでは、CreateBinFile 実行可能ファイルを使用して、熱力学プロパティと輸送プロパティをサーモトランスバイナリ ファイル (*.bin) に準備します。 
+    第2ステップでは、ScanMan は化学メカニズムを処理し、サーモトランスバイナリ ファイル (*.bin) から種のプロパティを追加します。 このステップ 
+
+    メカニズムのバイナリ ファイル (*.pre) を作成します。 
+
+    以下の2つの例で実行できます： 
+
+    cd "$FM_RUN_SM/GRI3.0" 
+    CreateBinFile -i gri.30.therm -m gri.30.trans -o gri.30.bin 
+    mv gri.30.bin "$FM_DATA/gri.30.bin" 
+    ScanMan -i gri.30.mech -t gri.30.bin -o "$FM_DATA/gri.30.pre" -sr &> gri.30.log  
+
+    生成されたメカニズム・バイナリ・ファイルを使用する前に、ログ・ファイルに「error」、「nan」、「inf」がないことを確認してください。 
+
+    生成されたメカニズム・バイナリ・ファイル（*.pre）を使用する前に、ログ・ファイルに「error」または「nan」または「inf」がないことを確認してください。 
+
+    cd "$FM_RUN_SM/deprecated/CreateThermoBin" 
+
+    CreateBinFile -i thermdat.mol -o thermdat.bin 
+
+    mv thermdat.bin "$FM_DATA/thermdat.bin". 
+
+    cd "$FM_RUN_SM/CH4" 
+
+    ScanMan -i CH4.72.mech -o "$FM_DATA/CH4.72.pre" -t thermdat.bin -sr &> CH4.72.log 
+
+    2 番目の例では、必要な熱力学データとトランスポート プロパティがすべて FlameMaster 固有の形式で含まれている「*.mol」ファイルが、CreateBinFile の専用入力ファイルとして使用されます。  
+
+    両方の例で示したように、バイナリ出力ファイルは FM_DATA ディレクトリに保存できます。これは、ScanMan がサーモトランスバイナリ ファイル (*.bin) を検索するデフォルトの場所です。  
+
+    この環境変数は、バイナリ メカニズム ファイルを見つけるために FlameMan によってもチェックされます。 熱力学特性と機構の不適切なリンクを避けるために、バージョン 3.3.11 以降、以前のバージョンの `-S` オプションがデフォルトになっていることに注意してください。
+
+    現在のバージョンでは、ScanMan はデフォルトで文字列比較に基づいて機構内の種と熱力学および輸送特性をリンクします。 これにより、種名に含まれるあらゆる特性 (例: 異なる配座異性体、励起状態など) を区別することが可能になります。 以前のバージョンでは、ScanMan は、通常は意図されていない合計式比較にフォールバックする可能性がありました。 
+
+    ScanMan の最近のバージョン (バージョン 3.3.11 以上) は、Chemkin 形式で化学メカニズムを処理することもできます。 この形式を使用すると、メカニズム バイナリ ファイルが 1 つのステップで生成されます。。 
+
+    ScanMan -i A_ChemKin_Mech.chmech -t ThermoProps.therm -m　TransProps.trans -f chemkin 
+
+    すべてのサンプルを実行し、それぞれの *.pre ファイルを FM_DATA パスに指定するには、次のスクリプトを使用します。 
+
+    次のスクリプトを使用します： 
+
+    cd "$FM_RUN_SM" 
+
+    chmod 755 CreateAllMechanisms.bash 
+
+    bash CreateAllMechanisms.bash
+
+メカニズム変換には、オプションのFortranコードをビルドする必要がある。 
+
+Fortranコードはデフォルトではビルドされません。Fortranコードはデフォルトではビルドされません。 
+
+COMPILE_FORTRAN_SRC' 'ON' を選択する必要があります。 
+
+この変数は 'cmake ../Repository' を実行した後に設定できます。 
+
+ccmake ../Repository' で設定できます。 
+
+ 
+
+反応機構： ChemkinからFlameMasterフォーマットへの変換 
+
+    UC San DiegoのReinhard Seiserが提供しています。 
+
+    #### 注意事項 
+    
+    chemkin インタープリタープログラムと一連のスクリプトを使用して、chemkin フォーマットを FlameMaster フォーマットに変換することができる。このツールは必要に応じて化学種名と熱データファイルも変換します。また、下限と上限のフィットがクロスオーバー温度で一致しない場合、熱データを再フィットします。 
+    
+    メカニズムファイルと熱データファイルが Unix タイプの改行を使用していることを確認してください。メカニズムファイルがDOSで作成されている場合、Unixファイルに変換する必要があります。私はBBeditでこれを行いますが、他にもフリーのコンバーターがあります。  
+
+    #### インストラクション 
+
+    ケムキンインタープリターは、（フォートランコンパイラーが利用可能であれば）インストー ル手順に従ってビルド、インストールされているはずです。それを起動する 
+    ``sh 
+
+    "$FM_BIN/ckintrp3seiser" を実行する。 
+
+    ``` 
+    を起動し、必要な入力ファイルを指定します： 
+
+    熱データファイル名 = ?: thermo211.dat 
+
+    入力モデルファイル名 = ?: grimech211.dat 
+
+    インタープリターのascii出力ファイル名 = ? #(任意のファイル名、後で必要になるので覚えておくこと。ここでは'a.i'と呼ぶ) 
+
+    CHEMKINリンクファイル名 = ? #任意のファイル名、ここでは'linkfile'と呼ぶことにする。 
+
+    ```     
+    ファイルの一番下の__a.i__のエラーをチェックし、場合によっては適切な変更を加える。 
+
+    この後、2つの異なるperlスクリプトを実行する必要がある。最初のスクリプトをchemkinのascii出力を使って実行する。 
+    sh 
+
+    chmod 755 *.perl 
+
+    ./mechi2tex.perl a.i 1 2 
+
+    ``` 
+
+    これで__a.mech__と__a.tex__というファイルができます。次に__a.mech__ファイルと2番目のperlスクリプトを続けます： 
+
+    ```sh 
+
+    ./modmech.perl -t thermo211.dat -r transport211.dat -o gri.211.mech a.mech 
+
+    ``` 
+    エラーメッセージをチェックし、スクリプトがデータを読み込む際に問題があれば、適切な修正を加える。 
+    これで2つのファイルができあがります。FlameMasterフォーマットのメカニズムはgri.30.mechになりました。このファイルはScanManによって使用され、データを前処理してバイナリファイルを生成し、FlameManプログラムの入力となる。2つ目のファイルはnewthermofileで、これはトランスポートとサーモのデータを組み合わせたものである。 
+    ScanManで使用するには前処理が必要です。コマンドは 
+    sh 
+
+    CreateBinFile -i newthermofile -o gri.211.thermo.bin です。 
+
+    ``` 
+    これで、ScanManの入力ファイルとなるバイナリファイルgri.211.thermo.binが作成されます。パスを指定せず、カレントディレクトリにない場合は、このファイルを$FM_DATAに移動します。 
+
+    ```sh 
+    mv gri.211.thermo.bin "$FM_DATA" 
+
+
+    これで、このメカニズムのScanManを実行することができます。 
+
+    ```sh 
+
+    ScanMan -i gri.211.mech -t gri.211.thermo.bin -S > gri.211.out 
+
+    ``` 
+    これを実行すると、M0（これは単なるMに相当する）は定義する必要がないというエラーが出るので、gri.211.mechファイル（一番下に近い）の定義をアンコメントすればうまくいく。エラーメッセージからviコマンドをコピーすればよい。 
+    でコメントする。 
+
+    #let M = 1.0[OTHER]. 
+
+    また、二重に定義された反応についての警告もいくつか表示される。GRI2.11ではこれは問題なく、意図されたものである。この警告は、意図しない反応の繰り返しを避けるためにメカニズムをコンパイルするときに有用である。この警告は重要ではないが、gri.211.mech ファイルの反応ラベルを以下のようにマッチさせることで、便宜的に警告を抑制することができる。 
+    例 
+
+    反応ラベルを次のように変更する  
+    
+    > 87:     OH + HO2 -> O2 + H2O { a = 1.450E+13 n = 0.000 E = -2.092 }. 
+    
+    > 287:    OH + HO2 -> O2 + H2O { a = 5.000E+15 n = 0.000 E = 72.509 } から 
+    
+    への 
+    
+    > 87.1:    OH + HO2 -> O2 + H2O { a = 1.450E+13 n = 0.000 E = -2.092 } 。 
+    
+    > 87.2:    OH + HO2 -> O2 + H2O { a = 5.000E+15 n = 0.000 E = 72.509 } 。 
+
+    主な結果は gri.211.pre というファイルです。このファイルを$FM_DATAに移動する。パスを指定せず、カレントディレクトリにない場合は、FlameManがこのファイルを探す。 
+
+    mv gri.211.pre 
+
+    mv gri.211.pre "$FM_DATA/gri.211.converted.pre" 
+
+    ``` 
+
+    #### FlameManの実行 
+
+    examples/Run/FlameManディレクトリに移動し、GRI2.11メカニズムでケースを実行することができます。例としてメタンの定常拡散火炎を計算します。良い解を開始プロファイルファイルとして使用してください。全く異なるメカニズムで収束させるのは、それほど簡単ではない場合があります。 
+
+    sh 
+
+    cd "$FM_RUN_FM/Diff/Steady/CH4" 
+
+    FlameMan -r gri.211.converted.pre 
+
+    ``` 
